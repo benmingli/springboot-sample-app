@@ -15,9 +15,6 @@
  */
 package de.codecentric.springbootsample;
 
-import javax.validation.Valid;
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -26,11 +23,17 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import javax.validation.Valid;
+import java.util.List;
+
 @Controller
 @RequestMapping("/")
 public class HomeController {
 
     private RecordRepository repository;
+
+    @Autowired
+    private FF4jProvider ff4jProvider;
 
     @Autowired
     public HomeController(RecordRepository repository) {
@@ -42,16 +45,18 @@ public class HomeController {
         List<Record> records = repository.findAll();
         model.addAttribute("records", records);
         model.addAttribute("insertRecord", new Record());
+        FF4j ff4j = ff4jProvider.getFF4j();
         return "home";
     }
 
     @RequestMapping(method = RequestMethod.POST)
-    public String insertData(ModelMap model, 
+    public String insertData(ModelMap model,
                              @ModelAttribute("insertRecord") @Valid Record record,
                              BindingResult result) {
         if (!result.hasErrors()) {
             repository.save(record);
         }
+        FF4j ff4j = ff4jProvider.getFF4j();
         return home(model);
     }
 }
